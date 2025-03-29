@@ -5,13 +5,9 @@ public class Bank implements HasMenu {
     private Admin admin;
     private CustomerList customers;
     
-    public Bank() {
+    public Bank() throws IOException, ClassNotFoundException {
         admin = new Admin();
         customers = new CustomerList();
-        
-        // Uncomment the next two lines to refresh data
-        //this.loadSampleCustomers();
-        //this.saveCustomers();
         
         this.loadCustomers();
         this.start();
@@ -26,55 +22,39 @@ public class Bank implements HasMenu {
         System.out.println("Sample customers loaded.");
     }
     
-    public void saveCustomers() {
-        try {
-            // Add debug information to see where the file is being saved
-            File file = new File("customers.ser");
-            System.out.println("Saving customers to: " + file.getAbsolutePath());
-            
-            FileOutputStream fileOut = new FileOutputStream(file);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(customers);
-            out.close();
-            fileOut.close();
-            System.out.println("Customers saved successfully.");
-            
-            // Verify the file exists
-            if(file.exists() && !file.isDirectory()) { 
-                System.out.println("Verified: File exists at " + file.getAbsolutePath() + 
-                                  " with size " + file.length() + " bytes");
-            }
-        } catch (IOException e) {
-            System.out.println("Error saving customers: " + e.getMessage());
-            e.printStackTrace(); // Print stack trace for debugging
+    public void saveCustomers() throws IOException {
+        File file = new File("customers.ser");
+        System.out.println("Saving customers to: " + file.getAbsolutePath());
+        
+        FileOutputStream fileOut = new FileOutputStream(file);
+        ObjectOutputStream out = new ObjectOutputStream(fileOut);
+        out.writeObject(customers);
+        out.close();
+        fileOut.close();
+        System.out.println("Customers saved successfully.");
+        
+        if(file.exists() && !file.isDirectory()) { 
+            System.out.println("Verified: File exists at " + file.getAbsolutePath() + 
+                              " with size " + file.length() + " bytes");
         }
     }
     
-    public void loadCustomers() {
-        try {
-            File file = new File("customers.ser");
-            System.out.println("Attempting to load customers from: " + file.getAbsolutePath());
-            
-            if(!file.exists()) {
-                System.out.println("File does not exist. Loading sample customers...");
-                loadSampleCustomers();
-                return;
-            }
-            
-            FileInputStream fileIn = new FileInputStream(file);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            customers = (CustomerList) in.readObject();
-            in.close();
-            fileIn.close();
-            System.out.println("Customers loaded successfully.");
-        } catch (FileNotFoundException e) {
-            System.out.println("No saved customers found. Loading sample customers...");
+    public void loadCustomers() throws IOException, ClassNotFoundException {
+        File file = new File("customers.ser");
+        System.out.println("Attempting to load customers from: " + file.getAbsolutePath());
+        
+        if(!file.exists()) {
+            System.out.println("File does not exist. Loading sample customers...");
             loadSampleCustomers();
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Error loading customers: " + e.getMessage());
-            System.out.println("Loading sample customers instead...");
-            loadSampleCustomers();
+            return;
         }
+        
+        FileInputStream fileIn = new FileInputStream(file);
+        ObjectInputStream in = new ObjectInputStream(fileIn);
+        customers = (CustomerList) in.readObject();
+        in.close();
+        fileIn.close();
+        System.out.println("Customers loaded successfully.");
     }
     
     public void fullCustomerReport() {
@@ -88,7 +68,7 @@ public class Bank implements HasMenu {
         }
     }
     
-    public void addUser() {
+    public void addUser() throws IOException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Add User");
         
@@ -101,11 +81,10 @@ public class Bank implements HasMenu {
         customers.add(new Customer(userName, pin));
         System.out.println("User added successfully.");
         
-        // Save after adding a user to ensure data persistence
         saveCustomers();
     }
     
-    public void applyInterest() {
+    public void applyInterest() throws IOException {
         System.out.println("Apply interest");
         for (Customer customer : customers) {
             SavingsAccount savings = customer.getSavings();
@@ -113,11 +92,10 @@ public class Bank implements HasMenu {
             System.out.println("New balance: " + savings.getBalanceString());
         }
         
-        // Save after applying interest to ensure data persistence
         saveCustomers();
     }
     
-    public void loginAsCustomer() {
+    public void loginAsCustomer() throws IOException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Customer login");
         
@@ -139,14 +117,13 @@ public class Bank implements HasMenu {
         if (currentCustomer != null) {
             System.out.println("Login successful.");
             currentCustomer.start();
-            // Save after customer session to ensure data persistence
             saveCustomers();
         } else {
             System.out.println("Invalid username or PIN.");
         }
     }
     
-    public void startAdmin() {
+    public void startAdmin() throws IOException {
         if (admin.login()) {
             System.out.println("Admin login successful.");
             boolean running = true;
@@ -156,12 +133,7 @@ public class Bank implements HasMenu {
                 Scanner scanner = new Scanner(System.in);
                 int choice;
                 
-                try {
-                    choice = Integer.parseInt(scanner.nextLine());
-                } catch (NumberFormatException e) {
-                    System.out.println("Invalid input. Please enter a number.");
-                    continue;
-                }
+                choice = Integer.parseInt(scanner.nextLine());
                 
                 if (choice == 0) {
                     running = false;
@@ -198,33 +170,34 @@ public class Bank implements HasMenu {
             Scanner scanner = new Scanner(System.in);
             int choice;
             
-            try {
-                choice = Integer.parseInt(scanner.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a number.");
-                continue;
-            }
+            choice = Integer.parseInt(scanner.nextLine());
             
             if (choice == 0) {
                 running = false;
                 System.out.println("Exiting system. Goodbye!");
             } else if (choice == 1) {
-                startAdmin();
+                try {
+                    startAdmin();
+                } catch (IOException e) {
+                    System.exit(1);
+                }
             } else if (choice == 2) {
-                loginAsCustomer();
+                try {
+                    loginAsCustomer();
+                } catch (IOException e) {
+                    System.exit(1);
+                }
             } else {
                 System.out.println("Invalid choice. Please try again.");
             }
         }
     }
     
-    // Helper method to format currency values
     public String formatCurrency(double amount) {
         return "$" + String.format("%.2f", amount);
     }
     
-    public static void main(String[] args) {
-        // Print the working directory to help with debugging file paths
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
         System.out.println("Working Directory = " + System.getProperty("user.dir"));
         new Bank();
     }

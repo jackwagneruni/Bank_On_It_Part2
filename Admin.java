@@ -17,8 +17,6 @@ public class Admin extends User {
     
     @Override
     public void start() {
-        // This is intentionally left blank per the assignment
-        // The Bank class will handle admin operations through startAdmin()
     }
     
     @Override
@@ -30,7 +28,6 @@ public class Admin extends User {
         Admin admin = new Admin();
         if (admin.login()) {
             System.out.println("Admin login successful!");
-            // The actual operations are handled by the Bank class
         } else {
             System.out.println("Admin login failed!");
         }

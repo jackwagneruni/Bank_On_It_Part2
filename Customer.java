@@ -9,7 +9,7 @@ public class Customer extends User implements Serializable {
 
     public Customer() {
         checking = new CheckingAccount();
-        savings = new SavingsAccount(0, 0.05); // Default interest rate of 5%
+        savings = new SavingsAccount(0, 0.05);
         currencyFormatter = NumberFormat.getCurrencyInstance();
     }
 
@@ -61,11 +61,7 @@ public class Customer extends User implements Serializable {
     private int getChoice() {
         Scanner scanner = new Scanner(System.in);
         int choice = -1;
-        try {
-            choice = Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input, please enter a number.");
-        }
+        choice = Integer.parseInt(scanner.nextLine());
         return choice;
     }
 
@@ -99,10 +95,7 @@ public class Customer extends User implements Serializable {
         return savings;
     }
     
-    /**
-     * Helper method to ensure currency formatter is initialized
-     * This handles the case where the formatter might be null after deserialization
-     */
+
     private NumberFormat getCurrencyFormatter() {
         if (currencyFormatter == null) {
             currencyFormatter = NumberFormat.getCurrencyInstance();
@@ -112,7 +105,6 @@ public class Customer extends User implements Serializable {
 
     @Override
     public String getReport() {
-        // Ensure we use the getBalanceString() methods which already format with $ sign
         return "User: " + getUserName() + 
                ", Checking: " + checking.getBalanceString() + 
                ", Savings: " + savings.getBalanceString();

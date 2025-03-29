@@ -31,17 +31,7 @@ public class CheckingAccount implements HasMenu, Serializable {
     protected double getDouble() {
         Scanner scanner = new Scanner(System.in);
         double amount = 0.0;
-        boolean validInput = false;
-        
-        while (!validInput) {
-            try {
-                amount = Double.parseDouble(scanner.nextLine());
-                validInput = true;
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a valid number:");
-            }
-        }
-        
+        amount = Double.parseDouble(scanner.nextLine());
         return amount;
     }
 
@@ -87,13 +77,7 @@ public class CheckingAccount implements HasMenu, Serializable {
             Scanner scanner = new Scanner(System.in);
             int choice;
             
-            try {
-                choice = scanner.nextInt();
-            } catch (Exception e) {
-                System.out.println("Invalid input. Please enter a number.");
-                scanner.nextLine(); // Clear the scanner buffer
-                continue;
-            }
+            choice = scanner.nextInt();
 
             if (choice == 0) {
                 exit = true;
