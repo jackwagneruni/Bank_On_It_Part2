@@ -24,9 +24,8 @@ public class SavingsAccount extends CheckingAccount implements Serializable {
     public void calcInterest() {
         double interest = getBalance() * interestRate;
         setBalance(getBalance() + interest);
-        // Directly add the $ sign
-        System.out.println("Interest applied: $" + String.format("%.2f", interest));
-        System.out.println("New balance: " + getBalanceString());
+        // Only print the New balance line as shown in the expected output
+        // Removing the "Interest applied" line to match expected output
     }
 
     @Override
@@ -67,6 +66,8 @@ public class SavingsAccount extends CheckingAccount implements Serializable {
                 makeWithdraw();
             } else if (choice == 4) {
                 calcInterest();
+                // Add the check balance call here to show the updated balance
+                checkBalance();
             } else if (choice == 5) {
                 System.out.print("Enter new interest rate (as decimal, e.g., 0.05 for 5%): ");
                 double rate = getDouble();

@@ -28,20 +28,40 @@ public class Bank implements HasMenu {
     
     public void saveCustomers() {
         try {
-            FileOutputStream fileOut = new FileOutputStream("customers.ser");
+            // Add debug information to see where the file is being saved
+            File file = new File("customers.ser");
+            System.out.println("Saving customers to: " + file.getAbsolutePath());
+            
+            FileOutputStream fileOut = new FileOutputStream(file);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(customers);
             out.close();
             fileOut.close();
             System.out.println("Customers saved successfully.");
+            
+            // Verify the file exists
+            if(file.exists() && !file.isDirectory()) { 
+                System.out.println("Verified: File exists at " + file.getAbsolutePath() + 
+                                  " with size " + file.length() + " bytes");
+            }
         } catch (IOException e) {
             System.out.println("Error saving customers: " + e.getMessage());
+            e.printStackTrace(); // Print stack trace for debugging
         }
     }
     
     public void loadCustomers() {
         try {
-            FileInputStream fileIn = new FileInputStream("customers.ser");
+            File file = new File("customers.ser");
+            System.out.println("Attempting to load customers from: " + file.getAbsolutePath());
+            
+            if(!file.exists()) {
+                System.out.println("File does not exist. Loading sample customers...");
+                loadSampleCustomers();
+                return;
+            }
+            
+            FileInputStream fileIn = new FileInputStream(file);
             ObjectInputStream in = new ObjectInputStream(fileIn);
             customers = (CustomerList) in.readObject();
             in.close();
@@ -80,6 +100,9 @@ public class Bank implements HasMenu {
         
         customers.add(new Customer(userName, pin));
         System.out.println("User added successfully.");
+        
+        // Save after adding a user to ensure data persistence
+        saveCustomers();
     }
     
     public void applyInterest() {
@@ -87,9 +110,11 @@ public class Bank implements HasMenu {
         for (Customer customer : customers) {
             SavingsAccount savings = customer.getSavings();
             savings.calcInterest();
-            // This already uses getBalanceString() which we updated to include $ sign
             System.out.println("New balance: " + savings.getBalanceString());
         }
+        
+        // Save after applying interest to ensure data persistence
+        saveCustomers();
     }
     
     public void loginAsCustomer() {
@@ -114,6 +139,8 @@ public class Bank implements HasMenu {
         if (currentCustomer != null) {
             System.out.println("Login successful.");
             currentCustomer.start();
+            // Save after customer session to ensure data persistence
+            saveCustomers();
         } else {
             System.out.println("Invalid username or PIN.");
         }
@@ -197,6 +224,8 @@ public class Bank implements HasMenu {
     }
     
     public static void main(String[] args) {
+        // Print the working directory to help with debugging file paths
+        System.out.println("Working Directory = " + System.getProperty("user.dir"));
         new Bank();
     }
 }
