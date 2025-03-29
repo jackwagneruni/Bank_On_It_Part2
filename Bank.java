@@ -87,6 +87,7 @@ public class Bank implements HasMenu {
         for (Customer customer : customers) {
             SavingsAccount savings = customer.getSavings();
             savings.calcInterest();
+            // This already uses getBalanceString() which we updated to include $ sign
             System.out.println("New balance: " + savings.getBalanceString());
         }
     }
@@ -188,6 +189,11 @@ public class Bank implements HasMenu {
                 System.out.println("Invalid choice. Please try again.");
             }
         }
+    }
+    
+    // Helper method to format currency values
+    public String formatCurrency(double amount) {
+        return "$" + String.format("%.2f", amount);
     }
     
     public static void main(String[] args) {

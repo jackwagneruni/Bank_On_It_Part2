@@ -1,6 +1,5 @@
 import java.io.Serializable;
 import java.util.Scanner;
-import java.text.NumberFormat;
 
 public class CheckingAccount implements HasMenu, Serializable {
     private double balance;
@@ -18,8 +17,7 @@ public class CheckingAccount implements HasMenu, Serializable {
     }
 
     public String getBalanceString() {
-        NumberFormat formatter = NumberFormat.getCurrencyInstance();
-        return formatter.format(balance);
+        return "$" + String.format("%.2f", balance);
     }
 
     protected void setBalance(double balance) {
@@ -53,7 +51,7 @@ public class CheckingAccount implements HasMenu, Serializable {
         
         if (amount > 0) {
             balance += amount;
-            System.out.println("Deposited: " + NumberFormat.getCurrencyInstance().format(amount));
+            System.out.println("Deposited: $" + String.format("%.2f", amount));
             System.out.println("New Balance: " + getBalanceString());
         } else {
             System.out.println("Invalid deposit amount.");
@@ -66,7 +64,7 @@ public class CheckingAccount implements HasMenu, Serializable {
         
         if (amount > 0 && amount <= balance) {
             balance -= amount;
-            System.out.println("Withdrawn: " + NumberFormat.getCurrencyInstance().format(amount));
+            System.out.println("Withdrawn: $" + String.format("%.2f", amount));
             System.out.println("New Balance: " + getBalanceString());
         } else {
             System.out.println("Invalid withdrawal amount.");

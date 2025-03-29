@@ -1,12 +1,16 @@
 import java.util.Scanner;
+import java.io.Serializable;
+import java.text.NumberFormat;
 
-public class Customer extends User {
+public class Customer extends User implements Serializable {
     private CheckingAccount checking;
     private SavingsAccount savings;
+    private transient NumberFormat currencyFormatter;
 
     public Customer() {
         checking = new CheckingAccount();
         savings = new SavingsAccount(0, 0.05); // Default interest rate of 5%
+        currencyFormatter = NumberFormat.getCurrencyInstance();
     }
 
     public Customer(String userName, String PIN) {
@@ -20,6 +24,7 @@ public class Customer extends User {
         setPIN(PIN);
         checking = new CheckingAccount(checkingBalance);
         savings = new SavingsAccount(savingsBalance, 0.05);
+        currencyFormatter = NumberFormat.getCurrencyInstance();
     }
 
     @Override
@@ -93,9 +98,21 @@ public class Customer extends User {
     public SavingsAccount getSavings() {
         return savings;
     }
+    
+    /**
+     * Helper method to ensure currency formatter is initialized
+     * This handles the case where the formatter might be null after deserialization
+     */
+    private NumberFormat getCurrencyFormatter() {
+        if (currencyFormatter == null) {
+            currencyFormatter = NumberFormat.getCurrencyInstance();
+        }
+        return currencyFormatter;
+    }
 
     @Override
     public String getReport() {
+        // Ensure we use the getBalanceString() methods which already format with $ sign
         return "User: " + getUserName() + 
                ", Checking: " + checking.getBalanceString() + 
                ", Savings: " + savings.getBalanceString();

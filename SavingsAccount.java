@@ -1,7 +1,7 @@
-import java.text.NumberFormat;
 import java.util.Scanner;
+import java.io.Serializable;
 
-public class SavingsAccount extends CheckingAccount {
+public class SavingsAccount extends CheckingAccount implements Serializable {
     private double interestRate;
 
     public SavingsAccount(double balance, double interestRate) {
@@ -24,7 +24,8 @@ public class SavingsAccount extends CheckingAccount {
     public void calcInterest() {
         double interest = getBalance() * interestRate;
         setBalance(getBalance() + interest);
-        System.out.println("Interest applied: " + NumberFormat.getCurrencyInstance().format(interest));
+        // Directly add the $ sign
+        System.out.println("Interest applied: $" + String.format("%.2f", interest));
         System.out.println("New balance: " + getBalanceString());
     }
 
